@@ -1,0 +1,12 @@
+What is RMSE?
+RMSE (Root Mean Square Error) measures the average magnitude of prediction errors.
+
+It calculates the square root of the average squared differences between predicted and actual values.
+
+
+Why Should RMSE Be Low?
+Lower RMSE = Better Model Accuracy (predictions are closer to actual values).
+
+Higher RMSE = Larger Errors (model predictions deviate significantly from true values).
+
+It penalizes large errors more heavily due to the squaring step, making it sensitive to outliers.

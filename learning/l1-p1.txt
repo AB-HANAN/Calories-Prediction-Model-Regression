@@ -1,0 +1,49 @@
+
+
+   Predicted       Actual   Difference
+       37.25        36.00         1.25
+       32.39        33.00        -0.61
+       13.65        13.00         0.65
+       56.37        57.00        -0.63
+       26.43        25.00         1.43
+
+MODEL COMPARISON:
++----+-------------------+-------+--------+--------+------------+
+|    | Model             |   MAE |    MSE |   RMSE |   R2 Score |
++====+===================+=======+========+========+============+
+|  0 | XGBoost           |  1.55 |   5.26 |   2.29 |       1.00 |
++----+-------------------+-------+--------+--------+------------+
+|  1 | Random Forest     |  1.84 |   8.90 |   2.98 |       1.00 |
++----+-------------------+-------+--------+--------+------------+
+|  2 | Gradient Boosting |  2.71 |  14.20 |   3.77 |       1.00 |
++----+-------------------+-------+--------+--------+------------+
+|  3 | SVR               |  0.62 |   2.67 |   1.64 |       1.00 |
++----+-------------------+-------+--------+--------+------------+
+|  4 | Linear Regression |  8.56 | 139.35 |  11.80 |       0.96 |
++----+-------------------+-------+--------+--------+------------+
+|  5 | Ridge Regression  |  8.56 | 139.34 |  11.80 |       0.96 |
++----+-------------------+-------+--------+--------+------------+
+|  6 | Lasso Regression  |  8.55 | 139.39 |  11.81 |       0.96 |
++----+-------------------+-------+--------+--------+------------+
+|  7 | K-Neighbors       |  4.57 |  51.88 |   7.20 |       0.99 |
++----+-------------------+-------+--------+--------+------------+
+|  8 | Decision Tree     |  8.99 | 157.70 |  12.56 |       0.96 |
++----+-------------------+-------+--------+--------+------------+
+
+Best Model: SVR
+Best RMSE: 1.64
+Best R2 Score: 0.9993
+
+
+
+models = {
+    'XGBoost': XGBRegressor(random_state=40),
+    'Random Forest': RandomForestRegressor(n_estimators=100, random_state=40),
+    'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, random_state=40),
+    'SVR': Pipeline([('scaler', StandardScaler()), ('svr', SVR(kernel='rbf', C=10))]),
+    'Linear Regression': LinearRegression(),
+    'Ridge Regression': Ridge(alpha=1.0),
+    'Lasso Regression': Lasso(alpha=0.1),
+    'K-Neighbors': KNeighborsRegressor(n_neighbors=5),
+    'Decision Tree': DecisionTreeRegressor(max_depth=5, random_state=40)
+}

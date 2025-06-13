@@ -1,0 +1,110 @@
+### **Model Selection Guide with Expanded Recommendations**
+
+
+#### **1. Linear Models**
+| Model          | Best For                          | Pros                          | Cons                          | Where It Lies |
+|----------------|-----------------------------------|-------------------------------|-------------------------------|---------------|
+| **Linear Regression** | Clearly linear relationships      | Simple, interpretable         | Poor with non-linear patterns | Baseline      |
+| **Ridge (L2)** | Linear data with multicollinearity | Reduces overfitting           | Doesn't perform feature selection | Regularized Linear |
+| **Lasso (L1)** | Linear data with many features    | Feature selection             | Struggles with high non-linearity | Regularized Linear |
+
+---
+
+#### **2. Non-Linear Models**
+| Model               | Best For                          | Pros                          | Cons                          | Where It Lies |
+|---------------------|-----------------------------------|-------------------------------|-------------------------------|---------------|
+| **Decision Tree**   | Simple non-linear relationships   | No scaling needed, interpretable | Prone to overfitting          | Basic Non-Linear |
+| **Random Forest**   | Complex non-linear patterns       | Handles outliers, robust      | Less interpretable            | Ensemble (Bagging) |
+| **Gradient Boosting** | Sequential non-linear patterns   | High accuracy                 | Sensitive to hyperparameters  | Ensemble (Boosting) |
+| **XGBoost**        | Large datasets, non-linearity     | Optimized performance         | Complex tuning                | Advanced Boosting |
+
+---
+
+#### **3. Distance-Based Models**
+| Model  | Best For                          | Pros                          | Cons                          | Where It Lies |
+|--------|-----------------------------------|-------------------------------|-------------------------------|---------------|
+| **KNN** | Local patterns, small datasets    | No training phase             | Slow prediction, needs scaling | Instance-Based |
+| **SVR** | High-dimensional non-linear data  | Effective with kernels        | Sensitive to scaling/tuning   | Kernel-Based |
+
+---
+
+### **Why SVR Might Be Your Best Model**
+If **SVR (Support Vector Regression)** performs best, it suggests:
+1. **Your data has complex non-linear patterns** that SVR's kernel (likely RBF) captures well.
+2. **The relationships are margin-sensitive** (SVR optimizes for points outside ε-tube).
+3. **Feature scaling was properly done** (critical for SVR's performance).
+
+**When to prefer SVR:**
+- Small-to-medium sized datasets
+- High-dimensional data (many features)
+- When you suspect non-linear but smooth relationships
+
+---
+
+### **Model Selection Flowchart**
+```mermaid
+graph TD
+    A[Start] --> B{Is relationship linear?}
+    B -->|Yes| C[Try Ridge/Lasso]
+    B -->|No| D{Data size?}
+    D -->|Small| E[SVR or KNN]
+    D -->|Large| F[RandomForest/XGBoost]
+    C --> G[Check residuals]
+    G -->|Patterns| D
+    G -->|Random| H[Linear is sufficient]
+    E --> I[Compare R²/MAE]
+    F --> I
+    I --> J[Select best performer]
+```
+
+---
+
+### **Practical Recommendations for Your Dataset**
+1. **If SVR wins**:
+   - Ensure you've scaled features (`StandardScaler`)
+   - Try different kernels (`rbf`, `poly`)
+   - Optimize `C` (regularization) and `epsilon` (margin)
+
+2. **For athletic performance data** (Calories prediction):
+   - **Tree-based models** often work well because:
+     - They capture interactions (e.g., Weight × Duration)
+     - Handle mixed feature types (continuous + categorical)
+
+3. **KNN Specifics**:
+   - Use only if you have:
+     - Low-dimensional data
+     - Meaningful distance metrics (scaled features)
+   - Warning: Curse of dimensionality with many features!
+
+4. **Gradient Boosting**:
+   - Middle ground between RandomForest and XGBoost
+   - Good default with `learning_rate=0.1`, `n_estimators=100`
+
+---
+
+### **Code to Compare All Models**
+```python
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+
+models = {
+    "Linear Regression": LinearRegression(),
+    "Ridge": Ridge(alpha=1.0),
+    "Lasso": Lasso(alpha=0.1),
+    "Decision Tree": DecisionTreeRegressor(max_depth=5),
+    "Random Forest": RandomForestRegressor(n_estimators=100),
+    "XGBoost": XGBRegressor(n_estimators=100),
+    "SVR": make_pipeline(StandardScaler(), SVR(kernel='rbf')),
+    "KNN": make_pipeline(StandardScaler(), KNeighborsRegressor())
+}
+
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    print(f"{name:15} R²: {r2_score(y_test, y_pred):.3f} | MAE: {mean_absolute_error(y_test, y_pred):.3f}")
+```
+
+Key takeaways:
+- **SVR/KNN need scaling** (use `make_pipeline` as shown)
+- **Tree-based models** dominate when interactions matter
+- **Linear models** are good baselines for interpretability
